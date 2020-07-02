@@ -1,85 +1,79 @@
 pragma solidity ^0.4.25;
 
-contract CampaignFactory{
-    address[] public deployedCampaigns;
-   
-    function createCampaign(uint mini) public{
-        address newCampaign = new Campaign(mini,msg.sender);//instantiating new contract syntax
-        deployedCampaigns.push(newCampaign);
-   
-    }
-    function getDeployedCampaigns() public view returns(address[]){
-        return deployedCampaigns;
-    }
-}
+//factory contract section
 
-contract Campaign{
-   
-    struct Request{
-        string description;
-        bool complete;
-        uint value;
-        address recipient;
-        uint approvalCount;
-        mapping(address=>bool) approvals;
-       
-       
+/*contract Factory{
+    address[] public deployedContractList;
+    
+    function deployContract(string location) public{
+        address newContract = new Version(location,msg.sender);//instantiating new contract syntax
+        deployedContractList.push(newContract);
+    
     }
-    Request[] public requests;
-    address public manager;
-    uint public minimumContribution;
-    mapping(address=>bool) public approvers;
-    uint approversCount;
-   
-    modifier restricted(){
-        require(msg.sender == manager);
-        _;
+    function getDeployedContracts() public view returns(address[]){
+        return deployedContractList;
     }
-   
-   
-    constructor(uint minimum,address creator) public {
-        manager = creator;//passing msg.sender address
-        minimumContribution =minimum;
+}*/
+
+//main contract section
+contract Version{
+    
+    address public owner;
+    string[] public versions;
+    uint version_count;
+    string direction;
+    
+    struct Editor{
+        address editor_address;
+        bool access;
+        bool editing_not_done;
     }
-   
-    function contribute() public payable{
-       
-        require(msg.value>minimumContribution);
-        approvers[msg.sender]=true;
-        approversCount++;
-    }
-    function createRequest(string description,uint value,address recipient) public restricted{
-       
-       Request memory newRequest=Request({ ///memory is important cuz Rqequest is storage
-          description: description,
-          value : value,
-          recipient : recipient,
-          complete: false,
-          approvalCount : 0
+    
+    
+    Editor[] public editor_list;
+    mapping(address => Editor) editor;
+    
+    constructor(string location) public{
+        
+        owner=msg.sender;
+        versions.push(location);
+        version_count++;
+        Editor memory newEditor=Editor({ ///memory is important cuz Rqequest is storage 
+          editor_address: owner,
+          access: true,
+          editing_not_done:false
            
        });
-       requests.push(newRequest);
-       
-       
-       
+       editor_list.push(newEditor);
+        
     }
-    function approveRequest(uint index) public{
-        require(approvers[msg.sender]);
-        require(!requests[index].approvals[msg.sender]);
+    
+    
+    
+
+   function fork() public returns(string){
        
-        requests[index].approvals[msg.sender]=true;
-        requests[index].approvalCount++;
+          Editor memory newEditor=Editor({ ///memory is important cuz Rqequest is storage 
+          editor_address: msg.sender,
+          access: true,
+          editing_not_done:true
+           
+       });
+       editor_list.push(newEditor);
+       direction=get_version();
+       return(direction);
+       
+   }
+   function update_versions(string location) public{
+        require(editor[msg.sender].access);
+        versions.push(location);
+        version_count++;
+        editor[msg.sender].editing_not_done=false;
     }
    
-    function finalizeRequest(uint index) public restricted{
+    
+   function get_version() public view returns(string){
        
-        require(!requests[index].complete);
-   
-       
-        require(requests[index].approvalCount>(approversCount/2));
-        requests[index].recipient.transfer(requests[index].value);
-        requests[index].complete=true;
-       
-    }
-   
+       return(versions[version_count-1]);
+   }    
 }
