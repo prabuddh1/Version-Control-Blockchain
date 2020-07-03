@@ -74,29 +74,6 @@ contract Version{
    function BasicINcentiveMOdel(address candidate) public view returns(uint){
        
        return(editor[candidate].version_name);
-       //return necessary details from Ediotor structure.
-       
-   }
-    
-   function getLatestVersion() public view returns(string){
-       
-       return(versions[version_count-1]);
-   }
-    
-    
-    
-    
-}
-   
-   function getEditorList() public view returns(address[]){
-       
-       return(editor_list);
-       
-   }
-   
-   function BasicINcentiveMOdel(address candidate) public view returns(uint){
-       
-       return(editor[candidate].version_name);
        
    }
     
