@@ -1,85 +1,111 @@
 pragma solidity ^0.4.25;
 
-contract CampaignFactory{
-    address[] public deployedCampaigns;
-   
-    function createCampaign(uint mini) public{
-        address newCampaign = new Campaign(mini,msg.sender);//instantiating new contract syntax
-        deployedCampaigns.push(newCampaign);
-   
-    }
-    function getDeployedCampaigns() public view returns(address[]){
-        return deployedCampaigns;
-    }
-}
+//factory contract section
 
-contract Campaign{
-   
-    struct Request{
-        string description;
-        bool complete;
-        uint value;
-        address recipient;
-        uint approvalCount;
-        mapping(address=>bool) approvals;
-       
-       
+/*contract Factory{
+    address[] public deployedContractList;
+    
+    function deployContract(string location) public{
+        address newContract = new Version(location,msg.sender);//instantiating new contract syntax
+        deployedContractList.push(newContract);
+    
     }
-    Request[] public requests;
-    address public manager;
-    uint public minimumContribution;
-    mapping(address=>bool) public approvers;
-    uint approversCount;
-   
-    modifier restricted(){
-        require(msg.sender == manager);
-        _;
+    function getDeployedContracts() public view returns(address[]){
+        return deployedContractList;
     }
-   
-   
-    constructor(uint minimum,address creator) public {
-        manager = creator;//passing msg.sender address
-        minimumContribution =minimum;
+}*/
+
+//main contract section
+contract Version{
+    
+    address public owner;
+    string[] private versions;
+    uint version_count;
+    string direction;
+    
+    struct Editor{
+        address editor_address;
+        bool access;
+        bool editing_not_done;
+        uint version_name;
     }
-   
-    function contribute() public payable{
+    
+    address[] public editor_list;
+    
+    mapping(address => Editor) editor;
+    
+    constructor(string location) public{
+        
+        owner=msg.sender;
+        versions.push(location);
+        version_count++;
        
-        require(msg.value>minimumContribution);
-        approvers[msg.sender]=true;
-        approversCount++;
+        editor_list.push(owner);  
+        editor[owner].editor_address=owner;
+        editor[owner].access=true;
+        editor[owner].editing_not_done=false;
+        editor[owner].version_name=1;
     }
-    function createRequest(string description,uint value,address recipient) public restricted{
-       
-       Request memory newRequest=Request({ ///memory is important cuz Rqequest is storage
-          description: description,
-          value : value,
-          recipient : recipient,
-          complete: false,
-          approvalCount : 0
-           
-       });
-       requests.push(newRequest);
-       
-       
-       
-    }
-    function approveRequest(uint index) public{
-        require(approvers[msg.sender]);
-        require(!requests[index].approvals[msg.sender]);
-       
-        requests[index].approvals[msg.sender]=true;
-        requests[index].approvalCount++;
+    
+   function fork() public {
+       //access modifiers with timeframe:
+    
+        
+        editor[msg.sender].editor_address=msg.sender;
+        editor[msg.sender].access=true;
+        editor[msg.sender].editing_not_done=true;
+        
     }
    
-    function finalizeRequest(uint index) public restricted{
-       
-        require(!requests[index].complete);
-   
-       
-        require(requests[index].approvalCount>(approversCount/2));
-        requests[index].recipient.transfer(requests[index].value);
-        requests[index].complete=true;
-       
+   function update_versions(string location) public{
+        versions.push(location);
+        version_count++;
+        editor[msg.sender].editing_not_done=false;
+        editor[msg.sender].version_name=version_count;
+        editor_list.push(msg.sender);
     }
    
+   function getEditorList() public view returns(address[]){
+       
+       return(editor_list);
+       
+   }
+   
+   function BasicINcentiveMOdel(address candidate) public view returns(uint){
+       
+       return(editor[candidate].version_name);
+       //return necessary details from Ediotor structure.
+       
+   }
+    
+   function getLatestVersion() public view returns(string){
+       
+       return(versions[version_count-1]);
+   }
+    
+    
+    
+    
+}
+   
+   function getEditorList() public view returns(address[]){
+       
+       return(editor_list);
+       
+   }
+   
+   function BasicINcentiveMOdel(address candidate) public view returns(uint){
+       
+       return(editor[candidate].version_name);
+       
+   }
+    
+   function getLatestVersion() public view returns(string){
+       
+       return(versions[version_count-1]);
+   }
+    
+    
+    
+    
 }
