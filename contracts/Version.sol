@@ -19,7 +19,7 @@ pragma solidity ^0.4.25;
 contract Version{
     
     address public owner;
-    string[] public versions;
+    string[] private versions;
     uint version_count;
     string direction;
     
@@ -27,10 +27,11 @@ contract Version{
         address editor_address;
         bool access;
         bool editing_not_done;
+        uint version_name;
     }
     
+    address[] public editor_list;
     
-    Editor[] public editor_list;
     mapping(address => Editor) editor;
     
     constructor(string location) public{
@@ -38,42 +39,50 @@ contract Version{
         owner=msg.sender;
         versions.push(location);
         version_count++;
-        Editor memory newEditor=Editor({ ///memory is important cuz Rqequest is storage 
-          editor_address: owner,
-          access: true,
-          editing_not_done:false
-           
-       });
-       editor_list.push(newEditor);
-        
+       
+        editor_list.push(owner);  
+        editor[owner].editor_address=owner;
+        editor[owner].access=true;
+        editor[owner].editing_not_done=false;
+        editor[owner].version_name=1;
     }
     
+   function fork() public {
+       //access modifiers with timeframe:
     
-    
-
-   function fork() public returns(string){
-       
-          Editor memory newEditor=Editor({ ///memory is important cuz Rqequest is storage 
-          editor_address: msg.sender,
-          access: true,
-          editing_not_done:true
-           
-       });
-       editor_list.push(newEditor);
-       direction=get_version();
-       return(direction);
-       
-   }
+        
+        editor[msg.sender].editor_address=msg.sender;
+        editor[msg.sender].access=true;
+        editor[msg.sender].editing_not_done=true;
+        
+    }
+   
    function update_versions(string location) public{
-        require(editor[msg.sender].access);
         versions.push(location);
         version_count++;
         editor[msg.sender].editing_not_done=false;
+        editor[msg.sender].version_name=version_count;
+        editor_list.push(msg.sender);
     }
    
+   function getEditorList() public view returns(address[]){
+       
+       return(editor_list);
+       
+   }
+   
+   function BasicINcentiveMOdel(address candidate) public view returns(uint){
+       
+       return(editor[candidate].version_name);
+       
+   }
     
-   function get_version() public view returns(string){
+   function getLatestVersion() public view returns(string){
        
        return(versions[version_count-1]);
-   }    
+   }
+    
+    
+    
+    
 }
