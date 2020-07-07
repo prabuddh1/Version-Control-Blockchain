@@ -30,7 +30,7 @@ contract Version{
     enum Stage{ CanFork,CannotFork}
     Stage public stage=Stage.CanFork;
     
-    struct Editor{
+    struct Editor{ 
         address editor_address;
         bool access;
         bool editing_not_done;
