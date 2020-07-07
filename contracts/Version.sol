@@ -30,9 +30,15 @@ contract Version{
         uint version_name;
     }
     
+    enum Stage{ Init, Fork, Done}
+    
+    Stage public stage=Stage.Init;
+    
     address[] public editor_list;
     
     mapping(address => Editor) editor;
+    
+    unit startTime;
     
     constructor(string location) public{
         
@@ -45,10 +51,16 @@ contract Version{
         editor[owner].access=true;
         editor[owner].editing_not_done=false;
         editor[owner].version_name=1;
+        
     }
     
    function fork() public {
        //access modifiers with timeframe:
+       
+       stage= Stage.Fork;
+       startTime=now;
+       
+       //if(now > startTime + 10 seconds)
     
         
         editor[msg.sender].editor_address=msg.sender;
@@ -58,11 +70,18 @@ contract Version{
     }
    
    function update_versions(string location) public{
+        
+        if(stage!=Stage.Fork) { return; }
+        
+        
         versions.push(location);
         version_count++;
         editor[msg.sender].editing_not_done=false;
         editor[msg.sender].version_name=version_count;
         editor_list.push(msg.sender);
+        
+        if(now > startTime +10 seconds)
+        {stage=Stage.Done; }
     }
    
    function getEditorList() public view returns(address[]){
