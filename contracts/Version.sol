@@ -33,6 +33,10 @@ contract Upload{
     
     }
     
+    function CreateNewMasterBranch() external{
+        address newContract = new Version(msg.sender);//instantiating new contract syntax
+        deployedContractList.push(newContract);
+    
     
     function getDeployedContracts() external view returns(address[]){
         return deployedContractList;
@@ -147,8 +151,4 @@ contract Version{
        
        return(versions[version_count-1]);
    }
-    
-    
-    
-    
 }
