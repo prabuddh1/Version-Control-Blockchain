@@ -8,7 +8,7 @@ contract CreateVideo{
     address[] public deployedContractList;
     
     constructor() public{
-        address newContract = new Upload(msg.sender);//instantiating new contract syntax
+        address newContract = new Upload();//instantiating new contract syntax
         deployedContractList.push(newContract);
     
     }
@@ -27,8 +27,8 @@ contract CreateVideo{
 contract Upload{
     address[] public deployedContractList;
     
-    constructor(address sender) public{
-        address newContract = new Version(sender);//instantiating new contract syntax
+    constructor() public{
+        address newContract = new Version(msg.sender);//instantiating new contract syntax
         deployedContractList.push(newContract);
     
     }
@@ -57,7 +57,9 @@ contract Version{
         bool editing_not_done;
         
         uint editCount;
-    }
+    } 
+   // struct Request
+    
     
   //  event Sunidhi(address edit,uint value);
     
