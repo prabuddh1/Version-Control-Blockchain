@@ -7,11 +7,14 @@ pragma solidity ^0.4.25;
 contract CreateVideo{
     address[] public deployedContractList;
     
-    constructor() public{
+    
+     function Create() external{
         address newContract = new Upload();//instantiating new contract syntax
         deployedContractList.push(newContract);
     
     }
+    
+    
     
     
     function getDeployedContracts() external view returns(address[]){
@@ -25,17 +28,16 @@ contract CreateVideo{
 // UPLOAD factory contract section
 
 contract Upload{
-    address[] public deployedContractList;
+    address[] private deployedContractList;
     
-    constructor() public{
-        address newContract = new Version(msg.sender);//instantiating new contract syntax
-        deployedContractList.push(newContract);
     
-    }
+    
     
     function CreateNewMasterBranch() external{
         address newContract = new Version(msg.sender);//instantiating new contract syntax
         deployedContractList.push(newContract);
+        
+    }
     
     
     function getDeployedContracts() external view returns(address[]){
@@ -151,4 +153,8 @@ contract Version{
        
        return(versions[version_count-1]);
    }
+    
+    
+    
+    
 }
