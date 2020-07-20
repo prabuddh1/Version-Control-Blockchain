@@ -5,19 +5,20 @@ pragma solidity ^0.4.25;
 
 
 contract CreateVideo{
-    address[] private deployedContract;
-    address public currentContract;
+    
+    mapping(address => address) private currentContract;
+    
     
     function Create() external{
         address newContract = new Upload();//instantiating new contract syntax
-        deployedContract.push(newContract);
-        currentContract =getDeployedContract();
-        
+        currentContract[msg.sender]=newContract;
+     }
+     
+    function getContract() public view returns(address){
+        return(currentContract[msg.sender]);
     }
     
-    function getDeployedContract() private view returns(address){
-        return deployedContract[deployedContract.length-1];
-    }
+    
 }
 
 // UPLOAD factory contract section
@@ -147,7 +148,7 @@ contract Version{
         
     }
     
-   function fork() external returns(string) {
+   function fork() external returns(string) {//extraction of data from transaction reciept
        
        require(msg.sender!=owner);
        
