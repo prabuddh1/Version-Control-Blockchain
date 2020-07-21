@@ -14,7 +14,7 @@ contract CreateVideo{
         currentContract[msg.sender]=newContract;
      }
      
-    function getContract() public view returns(address){
+    function getContract() external view returns(address){
         return(currentContract[msg.sender]);
     }
     
@@ -25,20 +25,25 @@ contract CreateVideo{
 
 contract Upload{
     
-    address[] private deployedContractList;
+    address[] public deployedContractList;
+    mapping(address => address) private currentContract;
     
+   
     
-    
-    
-    function CreateNewMasterBranch() external{
+    function CreateNewMasterBranch() public{
         address newContract = new Version(msg.sender);//instantiating new contract syntax
         deployedContractList.push(newContract);
+        currentContract[msg.sender]=newContract;
         
     }
     
     
     function getDeployedContracts() external view returns(address[]){
         return deployedContractList;
+    }
+    
+    function getContract() external view returns(address){
+        return(currentContract[msg.sender]);
     }
 
     
